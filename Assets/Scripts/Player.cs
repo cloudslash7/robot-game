@@ -7,13 +7,14 @@ public class Player : MonoBehaviour
 {
     public InputMaster controls;
     public LayerMask Ground;
+    public LayerMask Wall;
     Rigidbody2D rb;
     SpriteRenderer sprite;
     [SerializeField] float velocity = 0;
-    const float ACCELERATION = 30f;
+    const float ACCELERATION = 100f;
     const float DECELERATION = 50f;
     const float MAX_VELOCITY = 5f;
-    const float JUMP_THRUST = 12f;
+    const float JUMP_THRUST = 8f;
     bool facingRight = true;
     void Awake() {
         controls = new InputMaster();
@@ -55,19 +56,52 @@ public class Player : MonoBehaviour
 
         return false;
     }
+    bool IsOnRightWall() {
+        Vector2 position = transform.position;
+        float distance = .57f;
+
+        Debug.DrawRay(position, Vector2.right, Color.green);
+        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.right, distance, Wall);
+        if (hit.collider) {
+            Debug.Log("On right wall!");
+            return true;
+        }
+
+        return false;
+    }
+    bool IsOnLeftWall() {
+        Vector2 position = transform.position;
+        float distance = .57f;
+
+        Debug.DrawRay(position, Vector2.left, Color.green);
+        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.left, distance, Wall);
+        if (hit.collider) {
+            Debug.Log("On left wall!");
+            return true;
+        }
+
+        return false;
+    }
+    void WallJump(float jumpVelocity) {
+        rb.AddForce(new Vector2(0,JUMP_THRUST), ForceMode2D.Impulse);
+        velocity = jumpVelocity;
+    }
     void Jump() {
         if (IsGrounded()) {
             rb.AddForce(new Vector2(0,JUMP_THRUST), ForceMode2D.Impulse);
         }
+        else if (IsOnRightWall()) {
+            WallJump(-8f);
+        }
+        else if (IsOnLeftWall()) {
+            WallJump(8f);
+        }
     }
     void Move(float direction) {
-        if (direction == 0) {
-            Decelerate();
+        if (Mathf.Abs(velocity) < MAX_VELOCITY) {
+            velocity += direction * ACCELERATION * Time.fixedDeltaTime;
         }
-        else {
-            if (Mathf.Abs(velocity) < MAX_VELOCITY)
-                velocity += direction * ACCELERATION * Time.fixedDeltaTime;
-        }
+        Decelerate();
 
         rb.velocity = new Vector2(velocity, rb.velocity.y);
     }
