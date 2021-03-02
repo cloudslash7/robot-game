@@ -33,6 +33,14 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Hover"",
+                    ""type"": ""Button"",
+                    ""id"": ""139c9af9-d21d-452e-8b11-8de3fa80172c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
                 }
             ],
             ""bindings"": [
@@ -167,6 +175,17 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9aa30d6b-ef04-48dd-ac30-bdb8edf2b269"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": ""Hold"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Hover"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -205,6 +224,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_Hover = m_Player.FindAction("Hover", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -256,12 +276,14 @@ public class @InputMaster : IInputActionCollection, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_Hover;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
         public PlayerActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @Hover => m_Wrapper.m_Player_Hover;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -277,6 +299,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Jump.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                @Hover.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHover;
+                @Hover.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHover;
+                @Hover.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHover;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -287,6 +312,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @Hover.started += instance.OnHover;
+                @Hover.performed += instance.OnHover;
+                @Hover.canceled += instance.OnHover;
             }
         }
     }
@@ -313,5 +341,6 @@ public class @InputMaster : IInputActionCollection, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnHover(InputAction.CallbackContext context);
     }
 }

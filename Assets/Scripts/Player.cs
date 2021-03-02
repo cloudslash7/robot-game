@@ -10,11 +10,14 @@ public class Player : MonoBehaviour
     public LayerMask Wall;
     Rigidbody2D rb;
     SpriteRenderer sprite;
-    [SerializeField] float velocity = 0;
-    const float ACCELERATION = 100f;
-    const float DECELERATION = 50f;
+    [SerializeField] Vector2 velocity = new Vector2(0f, 0f);
+    const float ACCELERATION = 90f;
+    const float MIDAIR_ACCELERATION = 22f;
+    const float DECELERATION = 40f;
+    const float MIDAIR_DECELERATION = 9f;
     const float MAX_VELOCITY = 5f;
-    const float JUMP_THRUST = 8f;
+    const float JUMP_VELOCITY = 12f;
+    const float WALL_JUMP_VELOCITY = 6f;
     bool facingRight = true;
     void Awake() {
         controls = new InputMaster();
@@ -28,15 +31,15 @@ public class Player : MonoBehaviour
     void OnDisable() {
         controls.Disable();
     }
-    void Decelerate() {
-        if (velocity > .75f) {
-            velocity -= DECELERATION * Time.fixedDeltaTime;
+    void Decelerate(float deceleration) {
+        if (velocity.x > .4f) {
+            velocity.x -= deceleration * Time.fixedDeltaTime;
         }
-        else if (velocity < -.75f) {
-            velocity += DECELERATION * Time.fixedDeltaTime;
+        else if (velocity.x < -.4f) {
+            velocity.x += deceleration * Time.fixedDeltaTime;
         }
         else {
-            velocity = 0;
+            velocity.x = 0;
         }
     }
     private void Flip() {
@@ -46,7 +49,7 @@ public class Player : MonoBehaviour
     bool IsGrounded() {
         Vector2 position = transform.position;
         Vector2 direction = Vector2.down;
-        float distance = .595f;
+        float distance = .4f;
 
         Debug.DrawRay(position, direction, Color.green);
         RaycastHit2D hit = Physics2D.Raycast(position, direction, distance, Ground);
@@ -56,62 +59,58 @@ public class Player : MonoBehaviour
 
         return false;
     }
-    bool IsOnRightWall() {
+    int OnWall() {
         Vector2 position = transform.position;
-        float distance = .57f;
+        float distance = .4f;
 
-        Debug.DrawRay(position, Vector2.right, Color.green);
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.right, distance, Wall);
-        if (hit.collider) {
-            Debug.Log("On right wall!");
-            return true;
+        RaycastHit2D hitRight = Physics2D.Raycast(position, Vector2.right, distance, Wall);
+        RaycastHit2D hitLeft = Physics2D.Raycast(position, Vector2.left, distance, Wall);
+        if (hitRight.collider) {
+            return -1;
+        }
+        else if (hitLeft.collider) {
+            return 1;
         }
 
-        return false;
+        return 0;
     }
-    bool IsOnLeftWall() {
-        Vector2 position = transform.position;
-        float distance = .57f;
-
-        Debug.DrawRay(position, Vector2.left, Color.green);
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.left, distance, Wall);
-        if (hit.collider) {
-            Debug.Log("On left wall!");
-            return true;
-        }
-
-        return false;
-    }
-    void WallJump(float jumpVelocity) {
-        rb.AddForce(new Vector2(0,JUMP_THRUST), ForceMode2D.Impulse);
+    void WallJump(Vector2 jumpVelocity) {
         velocity = jumpVelocity;
+        rb.velocity = jumpVelocity;
     }
     void Jump() {
         if (IsGrounded()) {
-            rb.AddForce(new Vector2(0,JUMP_THRUST), ForceMode2D.Impulse);
+            velocity.y = JUMP_VELOCITY;
+            rb.velocity = new Vector2(rb.velocity.x, velocity.y);
         }
-        else if (IsOnRightWall()) {
-            WallJump(-8f);
-        }
-        else if (IsOnLeftWall()) {
-            WallJump(8f);
+        else if (OnWall() != 0) {
+            WallJump(new Vector2(WALL_JUMP_VELOCITY * OnWall(), JUMP_VELOCITY / 1.5f));
         }
     }
     void Move(float direction) {
-        if (Mathf.Abs(velocity) < MAX_VELOCITY) {
-            velocity += direction * ACCELERATION * Time.fixedDeltaTime;
+        if (Mathf.Abs(velocity.x) < MAX_VELOCITY) {
+            if (!IsGrounded()) {
+                velocity.x += direction * MIDAIR_ACCELERATION * Time.fixedDeltaTime;
+            }
+            else {
+                velocity.x += direction * ACCELERATION * Time.fixedDeltaTime;
+            }
         }
-        Decelerate();
-
-        rb.velocity = new Vector2(velocity, rb.velocity.y);
+        if (!IsGrounded()) {
+            Decelerate(MIDAIR_DECELERATION);
+        }
+        else {
+            Decelerate(DECELERATION);
+        }
+        rb.velocity = new Vector2(velocity.x, rb.velocity.y);
     }
     void Update() {
         Move(controls.Player.Move.ReadValue<float>());
 
-        if (velocity > 0 && !facingRight) {
+        if (velocity.x > 0 && !facingRight) {
             Flip();
         }
-        else if (velocity < 0 && facingRight) {
+        else if (velocity.x < 0 && facingRight) {
             Flip();
         }
     }

@@ -20,6 +20,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Press"
+                },
+                {
+                    "name": "Hover",
+                    "type": "Button",
+                    "id": "139c9af9-d21d-452e-8b11-8de3fa80172c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press"
                 }
             ],
             "bindings": [
@@ -152,6 +160,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9aa30d6b-ef04-48dd-ac30-bdb8edf2b269",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hover",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
