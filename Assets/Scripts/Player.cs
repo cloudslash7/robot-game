@@ -19,9 +19,12 @@ public class Player : MonoBehaviour
     const float JUMP_VELOCITY = 12f;
     const float WALL_JUMP_VELOCITY = 6f;
     bool facingRight = true;
+    private bool _hover = false;
     void Awake() {
         controls = new InputMaster();
-        controls.Player.Jump.performed += ctx => Jump();
+        controls.Player.Jump.performed += _ => Jump();
+        controls.Player.Hover.performed += ctx => _hover = true;
+        controls.Player.Hover.canceled += ctx => _hover = false;
         rb = GetComponent<Rigidbody2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
     }
@@ -87,6 +90,10 @@ public class Player : MonoBehaviour
             WallJump(new Vector2(WALL_JUMP_VELOCITY * OnWall(), JUMP_VELOCITY / 1.5f));
         }
     }
+    void Hover() {
+        velocity.y = .4f;
+        rb.velocity = velocity;
+    }
     void Move(float direction) {
         if (Mathf.Abs(velocity.x) < MAX_VELOCITY) {
             if (!IsGrounded()) {
@@ -106,7 +113,9 @@ public class Player : MonoBehaviour
     }
     void Update() {
         Move(controls.Player.Move.ReadValue<float>());
-
+        if (!IsGrounded() && _hover) {
+            Hover();
+        }
         if (velocity.x > 0 && !facingRight) {
             Flip();
         }

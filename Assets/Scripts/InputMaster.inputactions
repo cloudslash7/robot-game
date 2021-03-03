@@ -11,11 +11,11 @@
                     "id": "af6f417d-8def-450b-920b-4e46e4a09e28",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold(duration=0.05,pressPoint=0.05)"
+                    "interactions": "Press"
                 },
                 {
                     "name": "Jump",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "c6d04503-10f3-434e-83cd-e841e51eef4a",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -23,11 +23,11 @@
                 },
                 {
                     "name": "Hover",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "139c9af9-d21d-452e-8b11-8de3fa80172c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press"
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -167,9 +167,9 @@
                     "name": "",
                     "id": "9aa30d6b-ef04-48dd-ac30-bdb8edf2b269",
                     "path": "<Gamepad>/buttonSouth",
-                    "interactions": "Hold",
+                    "interactions": "Hold(duration=0.6)",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Gamepad",
                     "action": "Hover",
                     "isComposite": false,
                     "isPartOfComposite": false
