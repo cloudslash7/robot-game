@@ -3,28 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
-{
+public class Player : MonoBehaviour {
     public InputMaster controls;
     public LayerMask Ground;
     public LayerMask Wall;
     Rigidbody2D rb;
     SpriteRenderer sprite;
     [SerializeField] Vector2 velocity = new Vector2(0f, 0f);
-    const float ACCELERATION = 90f;
-    const float MIDAIR_ACCELERATION = 22f;
-    const float DECELERATION = 40f;
-    const float MIDAIR_DECELERATION = 9f;
-    const float MAX_VELOCITY = 5f;
-    const float JUMP_VELOCITY = 12f;
-    const float WALL_JUMP_VELOCITY = 6f;
-    bool facingRight = true;
-    private bool _hover = false;
+    float acceleration = 90f;
+    float midairAcceleration = 22f;
+    float deceleration = 40f;
+    float midairDeceleration = 9f;
+    float maxVelocity = 5f;
+    float jumpVelocity = 12f;
+    float wallJumpVelocity = 6f;
+    [SerializeField] public bool hoverUnlocked = false;
+    private bool _facingRight = true;
+    private bool _hoverActive = false;
     void Awake() {
         controls = new InputMaster();
         controls.Player.Jump.performed += _ => Jump();
-        controls.Player.Hover.performed += ctx => _hover = true;
-        controls.Player.Hover.canceled += ctx => _hover = false;
+        controls.Player.Hover.performed += ctx => _hoverActive = true;
+        controls.Player.Hover.canceled += ctx => _hoverActive = false;
         rb = GetComponent<Rigidbody2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
     }
@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
         }
     }
     private void Flip() {
-        facingRight = !facingRight;
+        _facingRight = !_facingRight;
         transform.Rotate(0,180f,0);
     }
     bool IsGrounded() {
@@ -83,43 +83,43 @@ public class Player : MonoBehaviour
     }
     void Jump() {
         if (IsGrounded()) {
-            velocity.y = JUMP_VELOCITY;
+            velocity.y = jumpVelocity;
             rb.velocity = new Vector2(rb.velocity.x, velocity.y);
         }
         else if (OnWall() != 0) {
-            WallJump(new Vector2(WALL_JUMP_VELOCITY * OnWall(), JUMP_VELOCITY / 1.5f));
+            WallJump(new Vector2(wallJumpVelocity * OnWall(), jumpVelocity / 1.5f));
         }
     }
     void Hover() {
-        velocity.y = .4f;
-        rb.velocity = velocity;
+        if (hoverUnlocked) {
+            velocity.y = .4f;
+            rb.velocity = velocity;
+        }
     }
     void Move(float direction) {
-        if (Mathf.Abs(velocity.x) < MAX_VELOCITY) {
+        if (Mathf.Abs(velocity.x) < maxVelocity) {
             if (!IsGrounded()) {
-                velocity.x += direction * MIDAIR_ACCELERATION * Time.fixedDeltaTime;
+                velocity.x += direction * midairAcceleration * Time.fixedDeltaTime;
             }
             else {
-                velocity.x += direction * ACCELERATION * Time.fixedDeltaTime;
+                velocity.x += direction * acceleration * Time.fixedDeltaTime;
             }
         }
         if (!IsGrounded()) {
-            Decelerate(MIDAIR_DECELERATION);
+            Decelerate(midairDeceleration);
         }
         else {
-            Decelerate(DECELERATION);
+            Decelerate(deceleration);
         }
         rb.velocity = new Vector2(velocity.x, rb.velocity.y);
     }
     void Update() {
         Move(controls.Player.Move.ReadValue<float>());
-        if (!IsGrounded() && _hover) {
+        if (!IsGrounded() && _hoverActive) {
             Hover();
         }
-        if (velocity.x > 0 && !facingRight) {
-            Flip();
-        }
-        else if (velocity.x < 0 && facingRight) {
+        if ((velocity.x > 0 && !_facingRight) ||
+            (velocity.x < 0 && _facingRight)) {
             Flip();
         }
     }
