@@ -11,6 +11,6 @@ public class HoverPowerup : MonoBehaviour
         }
     }
     void Pickup(Collider2D player) {
-        player.GetComponent<Player>().hoverUnlocked = true;
+        player.GetComponent<PlayerStats>().hoverUnlocked = true;
     }
 }

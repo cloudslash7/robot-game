@@ -2,7 +2,7 @@
     "name": "InputMaster",
     "maps": [
         {
-            "name": "Player",
+            "name": "PlayerController",
             "id": "47e9120d-e3e9-4e7c-b352-f45304ad2e3a",
             "actions": [
                 {

@@ -15,7 +15,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
     ""name"": ""InputMaster"",
     ""maps"": [
         {
-            ""name"": ""Player"",
+            ""name"": ""PlayerController"",
             ""id"": ""47e9120d-e3e9-4e7c-b352-f45304ad2e3a"",
             ""actions"": [
                 {
@@ -220,11 +220,11 @@ public class @InputMaster : IInputActionCollection, IDisposable
         }
     ]
 }");
-        // Player
-        m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-        m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
-        m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_Hover = m_Player.FindAction("Hover", throwIfNotFound: true);
+        // PlayerController
+        m_PlayerController = asset.FindActionMap("PlayerController", throwIfNotFound: true);
+        m_PlayerController_Move = m_PlayerController.FindAction("Move", throwIfNotFound: true);
+        m_PlayerController_Jump = m_PlayerController.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerController_Hover = m_PlayerController.FindAction("Hover", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -271,39 +271,39 @@ public class @InputMaster : IInputActionCollection, IDisposable
         asset.Disable();
     }
 
-    // Player
-    private readonly InputActionMap m_Player;
-    private IPlayerActions m_PlayerActionsCallbackInterface;
-    private readonly InputAction m_Player_Move;
-    private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_Hover;
-    public struct PlayerActions
+    // PlayerController
+    private readonly InputActionMap m_PlayerController;
+    private IPlayerControllerActions m_PlayerControllerActionsCallbackInterface;
+    private readonly InputAction m_PlayerController_Move;
+    private readonly InputAction m_PlayerController_Jump;
+    private readonly InputAction m_PlayerController_Hover;
+    public struct PlayerControllerActions
     {
         private @InputMaster m_Wrapper;
-        public PlayerActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_Player_Move;
-        public InputAction @Jump => m_Wrapper.m_Player_Jump;
-        public InputAction @Hover => m_Wrapper.m_Player_Hover;
-        public InputActionMap Get() { return m_Wrapper.m_Player; }
+        public PlayerControllerActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_PlayerController_Move;
+        public InputAction @Jump => m_Wrapper.m_PlayerController_Jump;
+        public InputAction @Hover => m_Wrapper.m_PlayerController_Hover;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerController; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
-        public void SetCallbacks(IPlayerActions instance)
+        public static implicit operator InputActionMap(PlayerControllerActions set) { return set.Get(); }
+        public void SetCallbacks(IPlayerControllerActions instance)
         {
-            if (m_Wrapper.m_PlayerActionsCallbackInterface != null)
+            if (m_Wrapper.m_PlayerControllerActionsCallbackInterface != null)
             {
-                @Move.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
-                @Move.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
-                @Move.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
-                @Jump.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
-                @Jump.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
-                @Jump.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
-                @Hover.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHover;
-                @Hover.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHover;
-                @Hover.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnHover;
+                @Move.started -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnMove;
+                @Move.performed -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnMove;
+                @Move.canceled -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnMove;
+                @Jump.started -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnJump;
+                @Hover.started -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnHover;
+                @Hover.performed -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnHover;
+                @Hover.canceled -= m_Wrapper.m_PlayerControllerActionsCallbackInterface.OnHover;
             }
-            m_Wrapper.m_PlayerActionsCallbackInterface = instance;
+            m_Wrapper.m_PlayerControllerActionsCallbackInterface = instance;
             if (instance != null)
             {
                 @Move.started += instance.OnMove;
@@ -318,7 +318,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
             }
         }
     }
-    public PlayerActions @Player => new PlayerActions(this);
+    public PlayerControllerActions @PlayerController => new PlayerControllerActions(this);
     private int m_KeyboardSchemeIndex = -1;
     public InputControlScheme KeyboardScheme
     {
@@ -337,7 +337,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
             return asset.controlSchemes[m_GamepadSchemeIndex];
         }
     }
-    public interface IPlayerActions
+    public interface IPlayerControllerActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);

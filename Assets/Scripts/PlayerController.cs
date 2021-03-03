@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
     public InputMaster controls;
     public LayerMask Ground;
     public LayerMask Wall;
     Rigidbody2D rb;
     SpriteRenderer sprite;
     [SerializeField] Vector2 velocity = new Vector2(0f, 0f);
+    PlayerStats stats;
     float acceleration = 90f;
     float midairAcceleration = 22f;
     float deceleration = 40f;
@@ -17,16 +18,18 @@ public class Player : MonoBehaviour {
     float maxVelocity = 5f;
     float jumpVelocity = 12f;
     float wallJumpVelocity = 6f;
-    [SerializeField] public bool hoverUnlocked = false;
     private bool _facingRight = true;
     private bool _hoverActive = false;
     void Awake() {
         controls = new InputMaster();
-        controls.Player.Jump.performed += _ => Jump();
-        controls.Player.Hover.performed += ctx => _hoverActive = true;
-        controls.Player.Hover.canceled += ctx => _hoverActive = false;
+        controls.PlayerController.Jump.performed += _ => Jump();
+        controls.PlayerController.Hover.performed += ctx => _hoverActive = true;
+        controls.PlayerController.Hover.canceled += ctx => _hoverActive = false;
         rb = GetComponent<Rigidbody2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
+    }
+    void Start() {
+        stats = this.GetComponent<PlayerStats>();
     }
     void OnEnable() {
         controls.Enable();
@@ -91,7 +94,7 @@ public class Player : MonoBehaviour {
         }
     }
     void Hover() {
-        if (hoverUnlocked) {
+        if (stats.hoverUnlocked) {
             velocity.y = .4f;
             rb.velocity = velocity;
         }
@@ -114,7 +117,7 @@ public class Player : MonoBehaviour {
         rb.velocity = new Vector2(velocity.x, rb.velocity.y);
     }
     void Update() {
-        Move(controls.Player.Move.ReadValue<float>());
+        Move(controls.PlayerController.Move.ReadValue<float>());
         if (!IsGrounded() && _hoverActive) {
             Hover();
         }
